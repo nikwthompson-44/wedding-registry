@@ -442,6 +442,21 @@
     btn.disabled = false;
     closeModal();
   });
+
+  // =============================================
+  // Auto-resize: tell parent frame our height
+  // =============================================
+  function postHeight() {
+    window.parent.postMessage(
+      { type: 'registry-resize', height: document.body.scrollHeight },
+      '*'
+    );
+  }
+  // Send height after load, after renders, and on resize
+  window.addEventListener('load', postHeight);
+  window.addEventListener('resize', postHeight);
+  const _origRender = renderGrid;
+  renderGrid = function() { _origRender(); requestAnimationFrame(postHeight); };
 </script>
 
 </body>
