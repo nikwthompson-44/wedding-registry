@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nik & Georgia's Gift Registry</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: #FEFEFE;
+      color: #2d2d2d;
+      line-height: 1.6;
+    }
+
+    h1, h2, h3 {
+      font-family: 'Cormorant Garamond', serif;
+      color: #5C6E42;
+      font-weight: 600;
+    }
+
+    .container {
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 2rem 1.5rem;
+    }
+
+    /* Header */
+    .header {
+      text-align: center;
+      padding: 2.5rem 1.5rem 1.5rem;
+    }
+    .header h1 {
+      font-size: 2.4rem;
+      margin-bottom: 0.5rem;
+    }
+    .header p {
+      font-size: 1.05rem;
+      color: #666;
+      max-width: 500px;
+      margin: 0 auto;
+    }
+
+    /* Honeymoon Fund */
+    .honeymoon {
+      text-align: center;
+      background: #f7f6f2;
+      border-radius: 12px;
+      padding: 2rem;
+      margin-bottom: 2.5rem;
+    }
+    .honeymoon h2 {
+      font-size: 1.6rem;
+      margin-bottom: 0.5rem;
+    }
+    .honeymoon p {
+      color: #555;
+      max-width: 480px;
+      margin: 0 auto 1.2rem;
+    }
+    .btn {
+      display: inline-block;
+      background: #223E1F;
+      color: #fff;
+      padding: 0.7rem 2rem;
+      border-radius: 8px;
+      text-decoration: none;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.95rem;
+      font-weight: 500;
+      border: none;
+      cursor: pointer;
+      transition: opacity 0.2s;
+    }
+    .btn:hover { opacity: 0.85; }
+
+    /* Grid */
+    .grid-heading {
+      text-align: center;
+      margin-bottom: 1.5rem;
+    }
+    .grid-heading h2 { font-size: 1.6rem; }
+
+    .gift-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 1.5rem;
+      margin-bottom: 2.5rem;
+    }
+    @media (min-width: 580px) {
+      .gift-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (min-width: 900px) {
+      .gift-grid { grid-template-columns: repeat(3, 1fr); }
+    }
+
+    /* Card */
+    .card {
+      background: #fff;
+      border: 1px solid #e8e6e1;
+      border-radius: 12px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      transition: opacity 0.3s, filter 0.3s;
+    }
+    .card.taken {
+      opacity: 0.45;
+      filter: grayscale(0.4);
+    }
+    .card-img-wrap {
+      position: relative;
+      width: 100%;
+      padding-top: 75%;
+      background: #f0efe9;
+      cursor: pointer;
+      overflow: hidden;
+    }
+    .card-img-wrap img {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: opacity 0.3s;
+    }
+    .card-img-wrap img.hidden { opacity: 0; position: absolute; }
+    .card-img-wrap .img-hint {
+      position: absolute;
+      bottom: 8px;
+      right: 8px;
+      background: rgba(0,0,0,0.45);
+      color: #fff;
+      font-size: 0.7rem;
+      padding: 2px 8px;
+      border-radius: 4px;
+      pointer-events: none;
+    }
+
+    .card-body {
+      padding: 1rem;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+    .card-body h3 {
+      font-size: 1.15rem;
+      margin-bottom: 0.3rem;
+      color: #5C6E42;
+    }
+    .card-body .desc {
+      font-size: 0.88rem;
+      color: #666;
+      margin-bottom: 0.8rem;
+      flex: 1;
+    }
+    .card-actions {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+    .btn-sm {
+      font-size: 0.82rem;
+      padding: 0.45rem 1rem;
+      border-radius: 6px;
+    }
+    .btn-outline {
+      background: transparent;
+      color: #223E1F;
+      border: 1px solid #223E1F;
+    }
+    .btn-outline:hover { background: #f3f6f1; }
+    .claimed-badge {
+      display: inline-block;
+      background: #e8e6e1;
+      color: #888;
+      padding: 0.45rem 1rem;
+      border-radius: 6px;
+      font-size: 0.82rem;
+      font-weight: 500;
+    }
+
+    /* Loading / Error */
+    .status {
+      text-align: center;
+      padding: 3rem 1rem;
+      color: #888;
+    }
+    .spinner {
+      display: inline-block;
+      width: 28px; height: 28px;
+      border: 3px solid #e8e6e1;
+      border-top-color: #5C6E42;
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      margin-bottom: 0.8rem;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* Modal */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.4);
+      backdrop-filter: blur(3px);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+    }
+    .modal-overlay.active { display: flex; }
+    .modal {
+      background: #fff;
+      border-radius: 14px;
+      padding: 2rem;
+      max-width: 400px;
+      width: 90%;
+      text-align: center;
+    }
+    .modal h3 {
+      font-size: 1.3rem;
+      margin-bottom: 0.5rem;
+    }
+    .modal p {
+      color: #555;
+      margin-bottom: 1.5rem;
+      font-size: 0.92rem;
+    }
+    .modal-actions {
+      display: flex;
+      gap: 0.75rem;
+      justify-content: center;
+    }
+
+    /* Footer */
+    .footer {
+      text-align: center;
+      padding: 1.5rem;
+      color: #aaa;
+      font-size: 0.85rem;
+    }
+
+    /* Fade-in animation */
+    .card { animation: fadeUp 0.4s ease both; }
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(12px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .card.taken { animation: fadeUp 0.4s ease both; }
+  </style>
+</head>
+<body>
+
+  <div class="header">
+    <h1>Our Gift Registry</h1>
+    <p>Thank you for celebrating with us! If you'd like to give a gift, here are some things we'd love.</p>
+  </div>
+
+  <div class="container">
+    <div class="honeymoon">
+      <h2>Honeymoon Fund</h2>
+      <p>If you'd rather help us make memories, we'd love a contribution towards our honeymoon.</p>
+      <a class="btn" id="paypal-link" href="#" target="_blank" rel="noopener">Contribute via PayPal</a>
+    </div>
+
+    <div class="grid-heading">
+      <h2>Gift Ideas</h2>
+    </div>
+
+    <div id="gift-grid" class="gift-grid">
+      <div class="status">
+        <div class="spinner"></div>
+        <p>Loading gifts...</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">
+    <p>With love, Nik & Georgia</p>
+  </div>
+
+  <!-- Confirmation Modal -->
+  <div class="modal-overlay" id="modal">
+    <div class="modal">
+      <h3>Claiming this gift?</h3>
+      <p>You're marking <strong id="modal-item-name"></strong> as taken. This can't be undone — please only confirm if you're getting this gift!</p>
+      <div class="modal-actions">
+        <button class="btn btn-sm" id="modal-confirm">Yes, I'm getting this!</button>
+        <button class="btn btn-sm btn-outline" id="modal-cancel">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+<script>
+  // =============================================
+  // CONFIG — Update these two values
+  // =============================================
+  const CONFIG = {
+    SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbw7rjvaepYB3usV7i9KdRsNOl8cjrn5vhgqGb3q-qWKWVF-gye7ei-55y60Dvc906lSlA/exec',
+    PAYPAL_URL: 'https://paypal.me/itsnikt'
+  };
+
+  // =============================================
+  // State
+  // =============================================
+  let items = [];
+  let pendingRow = null;
+
+  // =============================================
+  // Init
+  // =============================================
+  document.addEventListener('DOMContentLoaded', () => {
+    document.getElementById('paypal-link').href = CONFIG.PAYPAL_URL;
+    fetchItems();
+  });
+
+  // =============================================
+  // Fetch items from Google Sheet via Apps Script
+  // =============================================
+  async function fetchItems() {
+    const grid = document.getElementById('gift-grid');
+    try {
+      const res = await fetch(CONFIG.SCRIPT_URL);
+      const data = await res.json();
+      items = data.items || [];
+      renderGrid();
+    } catch (err) {
+      grid.innerHTML = '<div class="status"><p>Couldn\'t load the registry — please try refreshing.</p></div>';
+    }
+  }
+
+  // =============================================
+  // Render the gift card grid
+  // =============================================
+  function renderGrid() {
+    const grid = document.getElementById('gift-grid');
+    // Sort: available first, then taken
+    const sorted = [...items].sort((a, b) => (a.taken === b.taken ? 0 : a.taken ? 1 : -1));
+
+    if (sorted.length === 0) {
+      grid.innerHTML = '<div class="status"><p>No gifts listed yet — check back soon!</p></div>';
+      return;
+    }
+
+    grid.innerHTML = sorted.map((item, i) => {
+      const hasImg2 = item.image2 && item.image2.trim();
+      const takenClass = item.taken ? 'taken' : '';
+      const delay = `animation-delay: ${i * 0.06}s`;
+
+      return `
+        <div class="card ${takenClass}" style="${delay}">
+          <div class="card-img-wrap" ${hasImg2 ? `onclick="toggleImage(this)"` : ''}>
+            <img src="${item.image1 || ''}" alt="${item.name}" class="active" loading="lazy">
+            ${hasImg2 ? `<img src="${item.image2}" alt="${item.name} alt" class="hidden" loading="lazy">` : ''}
+            ${hasImg2 ? '<span class="img-hint">Click for another view</span>' : ''}
+          </div>
+          <div class="card-body">
+            <h3>${item.name}</h3>
+            ${item.description ? `<p class="desc">${item.description}</p>` : ''}
+            <div class="card-actions">
+              ${item.taken
+                ? '<span class="claimed-badge">Claimed</span>'
+                : `<button class="btn btn-sm" onclick="openModal(${item.row}, '${item.name.replace(/'/g, "\\'")}')">Mark as Taken</button>`
+              }
+              ${item.url ? `<a class="btn btn-sm btn-outline" href="${item.url}" target="_blank" rel="noopener">View Item</a>` : ''}
+            </div>
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  // =============================================
+  // Image toggle
+  // =============================================
+  function toggleImage(wrap) {
+    const imgs = wrap.querySelectorAll('img');
+    if (imgs.length < 2) return;
+    imgs[0].classList.toggle('hidden');
+    imgs[0].classList.toggle('active');
+    imgs[1].classList.toggle('hidden');
+    imgs[1].classList.toggle('active');
+  }
+
+  // =============================================
+  // Confirmation modal
+  // =============================================
+  function openModal(row, name) {
+    pendingRow = row;
+    document.getElementById('modal-item-name').textContent = name;
+    document.getElementById('modal').classList.add('active');
+  }
+
+  function closeModal() {
+    document.getElementById('modal').classList.remove('active');
+    pendingRow = null;
+  }
+
+  document.getElementById('modal-cancel').addEventListener('click', closeModal);
+  document.getElementById('modal').addEventListener('click', (e) => {
+    if (e.target === e.currentTarget) closeModal();
+  });
+
+  // =============================================
+  // Mark as taken
+  // =============================================
+  document.getElementById('modal-confirm').addEventListener('click', async () => {
+    if (!pendingRow) return;
+    const row = pendingRow;
+    const btn = document.getElementById('modal-confirm');
+    btn.textContent = 'Claiming...';
+    btn.disabled = true;
+
+    try {
+      const res = await fetch(CONFIG.SCRIPT_URL, {
+        method: 'POST',
+        body: JSON.stringify({ row }),
+        headers: { 'Content-Type': 'text/plain' },
+        redirect: 'follow'
+      });
+      const data = await res.json();
+
+      if (data.success) {
+        const item = items.find(i => i.row === row);
+        if (item) item.taken = true;
+        renderGrid();
+      } else {
+        alert('Someone just claimed this one! Refreshing the list.');
+        await fetchItems();
+      }
+    } catch {
+      // Apps Script POST redirect can make the response opaque.
+      // Assume success and re-fetch to confirm.
+      await fetchItems();
+    }
+
+    btn.textContent = "Yes, I'm getting this!";
+    btn.disabled = false;
+    closeModal();
+  });
+</script>
+
+</body>
+</html>
